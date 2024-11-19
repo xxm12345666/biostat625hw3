@@ -35,88 +35,47 @@ Example: Multiple Linear Regression
 Using the built-in mtcars dataset, we'll model mpg as a function of cyl, disp, and hp.
 
 ```{r}
+# Load data
 data(mtcars)
-result=linear_regression_function(mtcars, "mpg", c("cyl","disp","hp"))
-result
+
+# Fit linear regression using custom function
+result <- linear_regression(mpg ~ wt + hp, data = mtcars)
+print(result)
+
 ```
 
 Comparison with lm
 ```{r}
-model=lm(mpg~cyl+disp+hp,mtcars)
-summary(model)
-CI=confint(model)
+# Fit model using lm
+lm_fit <- lm(mpg ~ wt + hp, data = mtcars)
+summary(lm_fit)
+
 ```
 
 
 Coefficient Comparison
 
 ```{r}
-#compare the coefficients
-compare_result1=matrix(NA,4,4)
-for (i in 1:4) {
-  compare_result1[i,1]=all.equal(summary(model)$coefficients[i,1], 
-                      result$Coefficients$Estimate[i], 
-                      tolerance = 1e-5)
-}
-for (i in 1:4) {
-  compare_result1[i,2]=all.equal(summary(model)$coefficients[i,2], 
-                      result$Coefficients$Std_Error[i], 
-                      tolerance = 1e-5)
-}
-for (i in 1:4) {
-  compare_result1[i,3]=all.equal(summary(model)$coefficients[i,3], 
-                      result$Coefficients$t_value[i], 
-                      tolerance = 1e-5)
-}
-for (i in 1:4) {
-  compare_result1[i,4]=all.equal(summary(model)$coefficients[i,4], 
-                      result$Coefficients$p_value[i], 
-                      tolerance = 1e-5)
-}
-print(paste("coefficients equal:",compare_result1))
+# Compare coefficients
+compare_coefficients <- all.equal(
+  result$coefficients,
+  coef(lm_fit),
+  tolerance = 1e-5
+)
+print(paste("Coefficients match:", compare_coefficients))
 
 
+```
 
-#compare the CI of beta_hat
-compare_result2=matrix(NA,4,2)
-for (i in 1:4) {
-  compare_result2[i,1]=all.equal(CI[i,1], 
-                      result$Coefficients$CI_lower[i], 
-                      tolerance = 1e-5)
-}
-for (i in 1:4) {
-  compare_result2[i,2]=all.equal(CI[i,2], 
-                      result$Coefficients$CI_upper[i], 
-                      tolerance = 1e-5)
-}
-print(paste("confidence interval equal:",compare_result2))
-
-
-#compare R-squared
-compare_result3=all.equal(summary(model)$r.squared, 
-                      result$Multiple_R_squared, 
-                      tolerance = 1e-5)
-print(paste("R_squared equal:",compare_result3))
-
-#compare adjusted R-squared
-compare_result4=all.equal(summary(model)$adj.r.squared , 
-                      result$Adjusted_R_squared, 
-                      tolerance = 1e-5)
-print(paste("adjusted_R_squared equal:",compare_result4))
-
-#compare residuals
-compare_result5=rep(NA,5)
-for (i in 1:5) {
-  compare_result5[i]=all.equal(as.numeric(quantile(residuals(model))[i]),
-               as.numeric(result$Residuals[i]),
-               tolerance = 1e-5)
-}
-print(paste("residuals equal:",compare_result5))
-
-#compare F-statistics, degree freedom
-#we can easily find both the F-statistics and degree freedom are equal.
-print(paste("F statistics and degree freedom equal:TRUE"))
-
+Standard Errors Comparison
+```{r}
+# Compare standard errors
+compare_se <- all.equal(
+  result$SE,
+  summary(lm_fit)$coefficients[, "Std. Error"],
+  tolerance = 1e-5
+)
+print(paste("Standard errors match:", compare_se))
 
 ```
 
@@ -157,12 +116,15 @@ Performance Benchmark
 We compare the runtime of the linear_regression function with lm() using the bench package.
 
 ```{r}
+library(bench)
+
 benchmark <- bench::mark(
-  Custom = linear_regression(X, y),
-  BaseR = lm(mpg ~ cyl + disp + hp, data = mtcars),
+  Custom = linear_regression(mpg ~ wt + hp, data = mtcars),
+  BaseR = lm(mpg ~ wt + hp, data = mtcars),
   check = FALSE
 )
 print(benchmark)
+
 
 ```
 
@@ -171,14 +133,13 @@ Additional Examples
 Simple Linear Regression
 ```{r}
 # Fit a simple linear regression model using custom function
-X_simple <- as.matrix(mtcars[, "disp", drop = FALSE])
-y_simple <- mtcars$mpg
-simple_result <- linear_regression(X_simple, y_simple)
+simple_result <- linear_regression(mpg ~ disp, data = mtcars)
 print(simple_result)
 
 # Compare with lm()
 simple_model <- lm(mpg ~ disp, data = mtcars)
 summary(simple_model)
+
 
 ```
 
