@@ -1,0 +1,130 @@
+---
+title: "linear_regression"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{linear_regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bench)
+library(LinearRegression)
+```
+
+Introduction
+
+The linear_regression function in the LinearRegression package fits a linear regression model and provides detailed outputs, including:
+
+- Regression coefficients, standard errors, t-values, and p-values
+- R-squared and adjusted R-squared
+- Residuals and fitted values
+- Residual standard error (RSE)
+
+The function supports multiple predictors and performs matrix-based computation.
+
+Example: Multiple Linear Regression
+
+Using the built-in mtcars dataset, we'll model mpg as a function of cyl, disp, and hp.
+
+```{r}
+data(mtcars)
+# Fit the model using custom linear_regression function
+X <- as.matrix(mtcars[, c("cyl", "disp", "hp")])
+y <- mtcars$mpg
+result <- linear_regression(X, y)
+print(result)
+
+```
+
+Comparison with lm
+
+Coefficient Comparison
+
+```{r}
+# Fit the model using lm()
+model <- lm(mpg ~ cyl + disp + hp, data = mtcars)
+summary(model)
+
+# Compare coefficients
+compare_coefficients <- all.equal(
+  result$coefficients,
+  coef(model),
+  tolerance = 1e-5
+)
+print(paste("Coefficients match:", compare_coefficients))
+
+```
+
+R-Squared and Adjusted R-Squared Comparison
+
+```{r}
+# Compare R-squared and adjusted R-squared
+compare_r_squared <- all.equal(
+  result$R2,
+  summary(model)$r.squared,
+  tolerance = 1e-5
+)
+compare_adj_r_squared <- all.equal(
+  result$Adjusted_R_squared,
+  summary(model)$adj.r.squared,
+  tolerance = 1e-5
+)
+print(paste("R-squared match:", compare_r_squared))
+print(paste("Adjusted R-squared match:", compare_adj_r_squared))
+
+```
+
+Residuals Comparison
+
+```{r}
+# Compare residuals
+compare_residuals <- all.equal(
+  result$residuals,
+  residuals(model),
+  tolerance = 1e-5
+)
+print(paste("Residuals match:", compare_residuals))
+
+```
+
+Performance Benchmark
+
+We compare the runtime of the linear_regression function with lm() using the bench package.
+
+```{r}
+benchmark <- bench::mark(
+  Custom = linear_regression(X, y),
+  BaseR = lm(mpg ~ cyl + disp + hp, data = mtcars),
+  check = FALSE
+)
+print(benchmark)
+
+```
+
+Additional Examples
+
+Simple Linear Regression
+```{r}
+# Fit a simple linear regression model using custom function
+X_simple <- as.matrix(mtcars[, "disp", drop = FALSE])
+y_simple <- mtcars$mpg
+simple_result <- linear_regression(X_simple, y_simple)
+print(simple_result)
+
+# Compare with lm()
+simple_model <- lm(mpg ~ disp, data = mtcars)
+summary(simple_model)
+
+```
+
+Conclusion
+
+The linear_regression function produces results that align closely with R's lm() function for both single and multiple linear regression. While slightly slower due to its custom implementation, it provides robust outputs and serves as an educational tool for understanding the mechanics of linear regression.

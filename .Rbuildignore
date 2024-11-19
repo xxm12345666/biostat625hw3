@@ -1,0 +1,7 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^LinearRegression\.Rproj$
+^doc$
+^Meta$
+^\.github$
+^README\.Rmd$
