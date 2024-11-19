@@ -12,10 +12,10 @@ linear_regression(X, y)
 \item{y}{A numeric vector of the response variable.}
 }
 \value{
-A list containing coefficients, residuals, standard errors, R², and other metrics.
+A list containing coefficients, residuals, standard errors, R square, and other metrics.
 }
 \description{
-Fits a linear regression model, supporting multiple variables, and provides coefficient estimates, residuals, R², and other statistical metrics.
+Fits a linear regression model, supporting multiple variables, and provides coefficient estimates, residuals, R square, and other statistical metrics.
 }
 \examples{
 # Example with a single predictor

@@ -4,10 +4,10 @@
 \alias{print.linear_regression}
 \title{Print Linear Regression Results}
 \usage{
-\method{print}{linear_regression}(object)
+\method{print}{linear_regression}(x, ...)
 }
 \arguments{
-\item{object}{An object of class linear_regression.}
+\item{x}{An object of class linear_regression.}
 }
 \description{
 Print Linear Regression Results

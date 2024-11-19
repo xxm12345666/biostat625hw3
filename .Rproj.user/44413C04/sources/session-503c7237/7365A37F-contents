@@ -1,10 +1,11 @@
 #' Custom Linear Regression Function
 #'
-#' Fits a linear regression model, supporting multiple variables, and provides coefficient estimates, residuals, R², and other statistical metrics.
+#' Fits a linear regression model, supporting multiple variables, and provides coefficient estimates, residuals, R square, and other statistical metrics.
 #'
+#' @importFrom stats pt
 #' @param X A matrix or data frame containing all predictor variables.
 #' @param y A numeric vector of the response variable.
-#' @return A list containing coefficients, residuals, standard errors, R², and other metrics.
+#' @return A list containing coefficients, residuals, standard errors, R square, and other metrics.
 #' @examples
 #' # Example with a single predictor
 #' X <- matrix(c(1, 2, 3, 4), ncol = 1)
@@ -53,7 +54,7 @@ linear_regression <- function(X, y) {
   # Compute total sum of squares (TSS)
   TSS <- sum((y - mean(y))^2)
 
-  # Compute R-squared (R²)
+  # Compute R-squared
   R2 <- 1 - RSS / TSS
 
   # Number of observations and predictors
@@ -91,17 +92,17 @@ linear_regression <- function(X, y) {
 
 #' Print Linear Regression Results
 #'
-#' @param object An object of class linear_regression.
+#' @param x An object of class linear_regression.
 #' @export
-print.linear_regression <- function(object) {
+print.linear_regression <- function(x, ...) {
   cat("Coefficients:\n")
-  print(object$coefficients)
+  print(x$coefficients)
   cat("\nStandard Errors:\n")
-  print(object$SE)
+  print(x$SE)
   cat("\nt values:\n")
-  print(object$t_values)
+  print(x$t_values)
   cat("\np values:\n")
-  print(object$p_values)
-  cat("\nResidual standard error (RSE):", object$RSE, "\n")
-  cat("R-squared (R²):", object$R2, "\n")
+  print(x$p_values)
+  cat("\nResidual standard error (RSE):", x$RSE, "\n")
+  cat("R-squared:", x$R2, "\n")
 }
