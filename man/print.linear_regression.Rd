@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{An object of class linear_regression.}
+
+\item{...}{Additional arguments (currently ignored).}
 }
 \description{
 Print Linear Regression Results

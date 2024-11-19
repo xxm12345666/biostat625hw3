@@ -20,69 +20,59 @@
 #' print(result)
 #' @export
 linear_regression <- function(X, y) {
-  # Ensure X is a matrix
-  if (!is.matrix(X)) {
-    if (is.data.frame(X)) {
-      X <- as.matrix(X)
-    } else {
-      stop("X must be a matrix or data frame")
-    }
-  }
-
-  # Ensure y is a numeric vector
-  if (!is.vector(y)) {
-    stop("y must be a numeric vector")
-  }
+  # Validate inputs
+  if (!is.matrix(X)) stop("X must be a matrix")
+  if (!is.numeric(y)) stop("y must be a numeric vector")
+  if (nrow(X) != length(y)) stop("Number of rows in X must match the length of y.")
 
   # Add intercept column
   X <- cbind(Intercept = 1, X)
 
-  # Solve for regression coefficients using the least squares formula
-  XtX_inv <- solve(t(X) %*% X)  # Compute (X'X)^(-1)
-  XtY <- t(X) %*% y             # Compute X'Y
-  coefficients <- XtX_inv %*% XtY
+  # Compute X'X
+  XtX <- t(X) %*% X
 
-  # Compute fitted values
+  # Check for singularity
+  if (kappa(XtX) > 1e12) stop("The matrix X'X is ill-conditioned or singular. Check for collinearity.")
+
+  # Solve for coefficients
+  XtX_inv <- solve(XtX)
+  coefficients <- XtX_inv %*% t(X) %*% y
+
+  # Calculate fitted values and residuals
   fitted_values <- X %*% coefficients
-
-  # Compute residuals
   residuals <- y - fitted_values
 
-  # Compute residual sum of squares (RSS)
+  # Residual sum of squares (RSS) and total sum of squares (TSS)
   RSS <- sum(residuals^2)
-
-  # Compute total sum of squares (TSS)
   TSS <- sum((y - mean(y))^2)
 
-  # Compute R-squared
+  # R-squared and Residual Standard Error (RSE)
   R2 <- 1 - RSS / TSS
-
-  # Number of observations and predictors
   n <- nrow(X)
   p <- ncol(X)
-
-  # Residual standard error (RSE)
   RSE <- sqrt(RSS / (n - p))
 
-  # Compute standard errors of coefficients
-  sigma_squared <- RSS / (n - p)
-  SE <- sqrt(diag(XtX_inv) * sigma_squared)
-
-  # Compute t-values and p-values
-  t_values <- coefficients / SE
-  p_values <- 2 * pt(-abs(t_values), df = n - p)
+  # Compute standard errors, t-values, and p-values
+  if (ncol(X) == 1) {  # Handle intercept-only model
+    SE <- t_values <- p_values <- NA
+  } else {
+    sigma_squared <- RSS / (n - p)
+    SE <- sqrt(diag(XtX_inv) * sigma_squared)
+    t_values <- coefficients / SE
+    p_values <- 2 * pt(-abs(t_values), df = n - p)
+  }
 
   # Output results
   result <- list(
-    coefficients = as.vector(coefficients),       # Regression coefficients
-    SE = as.vector(SE),                           # Standard errors
-    t_values = as.vector(t_values),               # t-values
-    p_values = as.vector(p_values),               # p-values
-    fitted_values = as.vector(fitted_values),     # Fitted values
-    residuals = as.vector(residuals),             # Residuals
-    RSS = RSS,                                    # Residual sum of squares
-    R2 = R2,                                      # R-squared
-    RSE = RSE                                     # Residual standard error
+    coefficients = as.vector(coefficients),
+    SE = as.vector(SE),
+    t_values = as.vector(t_values),
+    p_values = as.vector(p_values),
+    fitted_values = as.vector(fitted_values),
+    residuals = as.vector(residuals),
+    RSS = RSS,
+    R2 = R2,
+    RSE = RSE
   )
 
   # Assign class to the result
@@ -93,6 +83,7 @@ linear_regression <- function(X, y) {
 #' Print Linear Regression Results
 #'
 #' @param x An object of class linear_regression.
+#' @param ... Additional arguments (currently ignored).
 #' @export
 print.linear_regression <- function(x, ...) {
   cat("Coefficients:\n")
