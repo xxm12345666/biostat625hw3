@@ -1,0 +1,21 @@
+---
+title: "linear_regression_example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{linear_regression_example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(LinearRegression)
+fit <- linear_regression(mpg ~ wt + hp, data = mtcars)
+summary(fit)
+```
