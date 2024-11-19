@@ -7,11 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(LinearRegression)
+library(linearregression)
 
-test_that("linear_regression works", {
-  X <- matrix(c(1, 2, 3, 4), ncol = 1)
-  y <- c(2, 4, 6, 8)
-  result <- linear_regression(X, y)
-  expect_equal(as.vector(result$coefficients), c(0, 2))
-})
+test_check("linearregression")

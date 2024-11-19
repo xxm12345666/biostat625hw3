@@ -1,99 +1,74 @@
-#' Custom Linear Regression Function
+#' Linear Regression Function
 #'
-#' Fits a linear regression model, supporting multiple variables, and provides coefficient estimates, residuals, R square, and other statistical metrics.
-#'
-#' @importFrom stats pt
-#' @param X A matrix or data frame containing all predictor variables.
-#' @param y A numeric vector of the response variable.
-#' @return A list containing coefficients, residuals, standard errors, R square, and other metrics.
+#' This function performs a linear regression and calculates data related to linear regression models.
+#' @param df A dataframe containing the variables of interest.
+#' @param y The dependent variable from the dataframe.
+#' @param x The covariates from the dataframe.
+#' @return A list containing data related to linear regression models.
+#' @export
 #' @examples
-#' # Example with a single predictor
-#' X <- matrix(c(1, 2, 3, 4), ncol = 1)
-#' y <- c(2, 4, 6, 8)
-#' result <- linear_regression(X, y)
-#' print(result)
-#'
-#' # Example with multiple predictors
-#' X <- matrix(c(1, 2, 3, 4, 2, 3, 4, 5), ncol = 2)
-#' y <- c(3, 6, 7, 9)
-#' result <- linear_regression(X, y)
-#' print(result)
-#' @export
-linear_regression <- function(X, y) {
-  # Validate inputs
-  if (!is.matrix(X)) stop("X must be a matrix")
-  if (!is.numeric(y)) stop("y must be a numeric vector")
-  if (nrow(X) != length(y)) stop("Number of rows in X must match the length of y.")
+#' data(mtcars)
+#' result=linear_regression_function(mtcars, "mpg", c("cyl","disp","hp"))
+linear_regression_function=function(df,y,x){
+  #add x1 to x
+  y=as.matrix(df[,y,drop=FALSE])
+  x=as.matrix(df[,x,drop=FALSE])
+  x1=matrix(1,nrow=nrow(df),ncol=1)
+  colnames(x1)="Intercept"
+  x=cbind(x1,x)
 
-  # Add intercept column
-  X <- cbind(Intercept = 1, X)
+  #calculate
+  degree_freedom=nrow(df)-ncol(x)
+  beta_hat=solve(t(x)%*%x)%*%t(x)%*%y
+  H=x%*%solve(t(x)%*%x)%*%t(x)
+  dimension=nrow(H)
+  I_matrix=diag(dimension)
+  one_matrix=matrix(1,dimension,dimension)
+  sigma_hat=sqrt(sum((y-x%*%beta_hat)^2)/degree_freedom)
+  var_beta_hat=sigma_hat^2*solve(t(x)%*%x)
+  Estimate=beta_hat
+  Std_Error=sqrt(diag(var_beta_hat))
+  alpha=0.05
+  t_q=qt(1-alpha/2,degree_freedom)
+  CI_lower=Estimate-t_q*Std_Error
+  CI_upper=Estimate+t_q*Std_Error
+  SSR=t(y)%*%(H-one_matrix/dimension)%*%y
+  SSY=t(y)%*%(I_matrix-one_matrix/dimension)%*%y
+  SSE=t(y)%*%(I_matrix-H)%*%y
 
-  # Compute X'X
-  XtX <- t(X) %*% X
+  R_squared=SSR/SSY
+  adjusted_R_squared=1-(SSE/(degree_freedom))/(SSY/(nrow(df)-1))
 
-  # Check for singularity
-  if (kappa(XtX) > 1e12) stop("The matrix X'X is ill-conditioned or singular. Check for collinearity.")
+  t_value=Estimate/Std_Error
+  p_value=2*pt(-abs(t_value),degree_freedom)
 
-  # Solve for coefficients
-  XtX_inv <- solve(XtX)
-  coefficients <- XtX_inv %*% t(X) %*% y
+  F_statistics=(SSR/(ncol(x)-1))/(SSE/degree_freedom)
+  p_value_F=1-pf(F_statistics,ncol(x)-1,degree_freedom)
 
-  # Calculate fitted values and residuals
-  fitted_values <- X %*% coefficients
-  residuals <- y - fitted_values
+  #create output
+  df_output=data.frame(Estimate=Estimate,
+                       Std_Error=Std_Error,
+                       CI_lower=CI_lower,
+                       CI_upper=CI_upper,
+                       t_value=t_value,
+                       p_value=p_value)
+  rownames(df_output)=colnames(x)
+  colnames(df_output)=c("Estimate","Std_Error","CI_lower","CI_upper","t_value","p_value")
 
-  # Residual sum of squares (RSS) and total sum of squares (TSS)
-  RSS <- sum(residuals^2)
-  TSS <- sum((y - mean(y))^2)
+  residuals_output=y-x%*%beta_hat
+  residuals_q=quantile(as.numeric(residuals_output),probs=c(0,0.25,0.5,0.75,1))
+  residuals_df=data.frame(Min=residuals_q[1],
+                          Q1=residuals_q[2],
+                          Median=residuals_q[3],
+                          Q3=residuals_q[4],
+                          Max=residuals_q[5])
 
-  # R-squared and Residual Standard Error (RSE)
-  R2 <- 1 - RSS / TSS
-  n <- nrow(X)
-  p <- ncol(X)
-  RSE <- sqrt(RSS / (n - p))
-
-  # Compute standard errors, t-values, and p-values
-  if (ncol(X) == 1) {  # Handle intercept-only model
-    SE <- t_values <- p_values <- NA
-  } else {
-    sigma_squared <- RSS / (n - p)
-    SE <- sqrt(diag(XtX_inv) * sigma_squared)
-    t_values <- coefficients / SE
-    p_values <- 2 * pt(-abs(t_values), df = n - p)
-  }
-
-  # Output results
-  result <- list(
-    coefficients = as.vector(coefficients),
-    SE = as.vector(SE),
-    t_values = as.vector(t_values),
-    p_values = as.vector(p_values),
-    fitted_values = as.vector(fitted_values),
-    residuals = as.vector(residuals),
-    RSS = RSS,
-    R2 = R2,
-    RSE = RSE
+  list_output=list(Residuals=residuals_df,
+                   Coefficients=df_output,
+                   Residual_standard_error=paste(sigma_hat,"on",degree_freedom,"degrees of freedom"),
+                   Multiple_R_squared=as.numeric(R_squared[1,1]),
+                   Adjusted_R_squared=as.numeric(adjusted_R_squared[1,1]),
+                   F_statistics=paste(F_statistics,"on",ncol(x)-1,"and",degree_freedom,"DF",", p_value:",p_value_F)
   )
-
-  # Assign class to the result
-  class(result) <- "linear_regression"
-  return(result)
-}
-
-#' Print Linear Regression Results
-#'
-#' @param x An object of class linear_regression.
-#' @param ... Additional arguments (currently ignored).
-#' @export
-print.linear_regression <- function(x, ...) {
-  cat("Coefficients:\n")
-  print(x$coefficients)
-  cat("\nStandard Errors:\n")
-  print(x$SE)
-  cat("\nt values:\n")
-  print(x$t_values)
-  cat("\np values:\n")
-  print(x$p_values)
-  cat("\nResidual standard error (RSE):", x$RSE, "\n")
-  cat("R-squared:", x$R2, "\n")
+  return(list_output)
 }

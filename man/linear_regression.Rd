@@ -4,7 +4,7 @@
 \alias{linear_regression}
 \title{Custom Linear Regression Function}
 \usage{
-linear_regression(X, y)
+linear_regression(formula, data)
 }
 \arguments{
 \item{X}{A matrix or data frame containing all predictor variables.}
@@ -25,7 +25,7 @@ result <- linear_regression(X, y)
 print(result)
 
 # Example with multiple predictors
-X <- matrix(c(1, 2, 3, 4, 2, 3, 4, 5), ncol = 2)
+X <- matrix(c(1, 2, 3, 4, 1, 4, 9, 16), ncol = 2)
 y <- c(3, 6, 7, 9)
 result <- linear_regression(X, y)
 print(result)

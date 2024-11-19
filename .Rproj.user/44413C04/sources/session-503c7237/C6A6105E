@@ -3,7 +3,7 @@
     "path": "~/LinearRegression/DESCRIPTION",
     "project_path": "DESCRIPTION",
     "type": "dcf",
-    "hash": "3228391230",
+    "hash": "338217115",
     "contents": "",
     "dirty": false,
     "created": 1732053477410.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "6,52",
+        "cursorPosition": "9,14",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1732054176,
+    "lastKnownWriteTime": 1732057065,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1732054176962,
+    "last_content_update": 1732057065279,
     "read_only": false,
     "read_only_alternatives": []
 }
