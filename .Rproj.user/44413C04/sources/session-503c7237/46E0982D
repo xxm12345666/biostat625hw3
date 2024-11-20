@@ -3,7 +3,7 @@
     "path": "~/LinearRegression/vignettes/linear_regression.Rmd",
     "project_path": "vignettes/linear_regression.Rmd",
     "type": "r_markdown",
-    "hash": "2508732856",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1732053486954.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "140,21",
-        "scrollLine": "132"
+        "cursorPosition": "52,2",
+        "scrollLine": "35"
     },
     "folds": "",
-    "lastKnownWriteTime": 1732057809,
+    "lastKnownWriteTime": 1732063370,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1732057809283,
+    "last_content_update": 1732063370961,
     "read_only": false,
     "read_only_alternatives": []
 }

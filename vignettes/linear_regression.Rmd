@@ -85,12 +85,12 @@ R-Squared and Adjusted R-Squared Comparison
 # Compare R-squared and adjusted R-squared
 compare_r_squared <- all.equal(
   result$R2,
-  summary(model)$r.squared,
+  summary(lm_fit)$r.squared,
   tolerance = 1e-5
 )
 compare_adj_r_squared <- all.equal(
   result$Adjusted_R_squared,
-  summary(model)$adj.r.squared,
+  summary(lm_fit)$adj.r.squared,
   tolerance = 1e-5
 )
 print(paste("R-squared match:", compare_r_squared))
@@ -104,11 +104,10 @@ Residuals Comparison
 # Compare residuals
 compare_residuals <- all.equal(
   result$residuals,
-  residuals(model),
+  residuals(lm_fit),
   tolerance = 1e-5
 )
 print(paste("Residuals match:", compare_residuals))
-
 ```
 
 Performance Benchmark
@@ -139,9 +138,21 @@ print(simple_result)
 # Compare with lm()
 simple_model <- lm(mpg ~ disp, data = mtcars)
 summary(simple_model)
-
-
 ```
+
+Example: Multiple Linear Regression
+
+We will use the mtcars dataset to model mpg as a function of wt and hp.
+```{r}
+# Define model for custom function and lm()
+result <- linear_regression(mpg ~ wt + hp, data = mtcars)
+model <- lm(mpg ~ wt + hp, data = mtcars)
+
+# Print results
+print(result)
+summary(model)
+```
+
 
 Conclusion
 

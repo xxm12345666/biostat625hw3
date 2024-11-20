@@ -2,31 +2,34 @@
 % Please edit documentation in R/linear_regression.R
 \name{linear_regression}
 \alias{linear_regression}
-\title{Custom Linear Regression Function}
+\title{Linear Regression Function}
 \usage{
 linear_regression(formula, data)
 }
 \arguments{
-\item{X}{A matrix or data frame containing all predictor variables.}
+\item{formula}{A formula specifying the model (e.g., \code{y ~ x1 + x2}).}
 
-\item{y}{A numeric vector of the response variable.}
+\item{data}{A data frame containing the variables used in the formula.}
 }
 \value{
-A list containing coefficients, residuals, standard errors, R square, and other metrics.
+A list with the following components:
+\itemize{
+\item \code{coefficients}: The estimated regression coefficients (named vector).
+\item \code{SE}: The standard errors of the coefficients.
+\item \code{t_values}: The t-statistics for the coefficients.
+\item \code{p_values}: The p-values for the coefficients.
+\item \code{fitted_values}: The predicted values from the model.
+\item \code{residuals}: The residuals from the model.
+\item \code{RSS}: Residual sum of squares.
+\item \code{R2}: R-squared statistic.
+\item \code{RSE}: Residual standard error.
+}
 }
 \description{
-Fits a linear regression model, supporting multiple variables, and provides coefficient estimates, residuals, R square, and other statistical metrics.
+This function performs a linear regression and calculates data related to linear regression models.
 }
 \examples{
-# Example with a single predictor
-X <- matrix(c(1, 2, 3, 4), ncol = 1)
-y <- c(2, 4, 6, 8)
-result <- linear_regression(X, y)
-print(result)
-
-# Example with multiple predictors
-X <- matrix(c(1, 2, 3, 4, 1, 4, 9, 16), ncol = 2)
-y <- c(3, 6, 7, 9)
-result <- linear_regression(X, y)
+data(mtcars)
+result <- linear_regression(mpg ~ wt + hp, data = mtcars)
 print(result)
 }

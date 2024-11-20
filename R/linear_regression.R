@@ -87,3 +87,6 @@ linear_regression <- function(formula, data) {
   class(result) <- "linear_regression"
   return(result)
 }
+
+
+

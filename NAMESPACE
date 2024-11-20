@@ -2,4 +2,3 @@
 
 S3method(print,linear_regression)
 export(linear_regression)
-importFrom(stats,pt)
